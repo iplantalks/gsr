@@ -73,7 +73,12 @@ export default {
         headers: { authorization: `Bearer ${access_token}` }
       }
     ).then(res => res.json())
-    return new Response(JSON.stringify(values, null, 2), { headers: { 'content-type': 'application/json' } })
+    return new Response(JSON.stringify(values, null, 2), {
+      headers: {
+        'content-type': 'application/json',
+        'access-control-allow-origin': req.headers.get('origin')
+      }
+    })
   }
 }
 
