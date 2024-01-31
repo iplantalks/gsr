@@ -73,12 +73,16 @@ export default {
         headers: { authorization: `Bearer ${access_token}` }
       }
     ).then(res => res.json())
-    return new Response(JSON.stringify(values, null, 2), {
+    var response = new Response(JSON.stringify(values, null, 2), {
       headers: {
         'content-type': 'application/json',
         'access-control-allow-origin': req.headers.get('origin')
       }
     })
+    if (url.searchParams.get('cache') && !isNaN(parseInt(url.searchParams.get('cache')))) {
+      response.headers.set('cache-control', `public, max-age=${parseInt(url.searchParams.get('cache'))}`)
+    }
+    return response
   }
 }
 
