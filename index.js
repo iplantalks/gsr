@@ -1,29 +1,3 @@
-/**
- * Converts input string or ArrayBuffer to base64url encoded string
- * @param {string | ArrayBuffer} input
- */
-function b64(input) {
-  const uint8Array = typeof input === 'string' ? new TextEncoder().encode(input) : new Uint8Array(input)
-  return btoa(String.fromCharCode(...uint8Array))
-    .replace(/=/g, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-}
-
-/**
- * Converts input string to ArrayBuffer
- * @param {string} str
- * @returns {ArrayBuffer}
- */
-function str2ab(str) {
-  const buf = new ArrayBuffer(str.length)
-  const bufView = new Uint8Array(buf)
-  for (let i = 0; i < str.length; i++) {
-    bufView[i] = str.charCodeAt(i)
-  }
-  return buf
-}
-
 export default {
   /**
    * Handler
@@ -52,6 +26,18 @@ export default {
     }
     if (!url.searchParams.get('range')) {
       return new Response(JSON.stringify({ message: 'range missing' }), { status: 400, headers: { 'Content-Type': 'application/json' } })
+    }
+    if (!env.CLIENT_EMAIL) {
+      return new Response(JSON.stringify({ message: 'CLIENT_EMAIL missing' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      })
+    }
+    if (!env.PRIVATE_KEY) {
+      return new Response(JSON.stringify({ message: 'PRIVATE_KEY missing' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      })
     }
 
     var key = await crypto.subtle.importKey(
@@ -89,4 +75,30 @@ export default {
     ).then(res => res.json())
     return new Response(JSON.stringify(values, null, 2), { headers: { 'content-type': 'application/json' } })
   }
+}
+
+/**
+ * Converts input string or ArrayBuffer to base64url encoded string
+ * @param {string | ArrayBuffer} input
+ */
+function b64(input) {
+  const uint8Array = typeof input === 'string' ? new TextEncoder().encode(input) : new Uint8Array(input)
+  return btoa(String.fromCharCode(...uint8Array))
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+}
+
+/**
+ * Converts input string to ArrayBuffer
+ * @param {string} str
+ * @returns {ArrayBuffer}
+ */
+function str2ab(str) {
+  const buf = new ArrayBuffer(str.length)
+  const bufView = new Uint8Array(buf)
+  for (let i = 0; i < str.length; i++) {
+    bufView[i] = str.charCodeAt(i)
+  }
+  return buf
 }
