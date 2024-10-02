@@ -65,14 +65,14 @@ export default {
         grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
         assertion: `${header}.${payload}.${b64(signature)}`
       })
-    }).then(r => r.json())
+    }).then(jsonMaybe)
 
     var { values } = await fetch(
       `https://sheets.googleapis.com/v4/spreadsheets/${url.searchParams.get('sheet')}/values/${url.searchParams.get('range')}`,
       {
         headers: { authorization: `Bearer ${access_token}` }
       }
-    ).then(res => res.json())
+    ).then(jsonMaybe)
     var response = new Response(JSON.stringify(values, null, 2), {
       headers: {
         'content-type': 'application/json',
@@ -83,6 +83,15 @@ export default {
       response.headers.set('cache-control', `public, max-age=${parseInt(url.searchParams.get('cache'))}`)
     }
     return response
+  }
+}
+
+async function jsonMaybe(response) {
+  const text = await response.text()
+  try {
+    return JSON.parse(text)
+  } catch {
+    throw new Error('Can not parse JSON from: ' + text)
   }
 }
 
